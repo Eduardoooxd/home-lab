@@ -1,10 +1,26 @@
+### Update the server
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
+### Setup Message of Day
+
 ```bash
-sudo apt install docker -y
+sudo tee /etc/motd < assets/frank_ocean.txt
 ```
+
+```bash
+sudo tee /etc/motd < assets/die_lit.txt
+```
+
+### Install Essential Pacakages
+
+```bash
+sudo apt install git docker -y
+```
+
+### Change Key SSH Configurations
 
 ### Firewall Setup
 
@@ -23,6 +39,8 @@ sudo ufw default deny incoming
 # Enable Firewall
 sudo ufw enable
 ```
+
+### Set up Fail2Ban
 
 ## TODO
 
