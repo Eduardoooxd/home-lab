@@ -167,3 +167,9 @@ sudo ufw status
 - Add Wireguard
 - Add ufw-docker
 - Add cloudflare tunnels
+
+## References:
+
+Setup of traefik
+
+- https://www.youtube.com/watch?v=liV3c9m_OX8

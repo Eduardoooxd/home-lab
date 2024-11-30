@@ -1,4 +1,4 @@
-**.env
+*.env
 
-**/certs/
-!**/certs/.gitkeep
+**/certs/*
+!**/certs/*.example

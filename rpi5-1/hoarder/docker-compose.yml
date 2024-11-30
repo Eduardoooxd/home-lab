@@ -10,7 +10,7 @@ services:
       - data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hoarder.rule=Host(`hoarder1.home.eduardocouto.dev`)"
+      - "traefik.http.routers.hoarder.rule=Host(`hoarder.home.eduardocouto.dev`)"
       - "traefik.http.routers.hoarder.entrypoints=https"
       - "traefik.http.routers.hoarder.tls=true"
       - "traefik.http.services.hoarder.loadbalancer.server.port=3000"
