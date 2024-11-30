@@ -1,0 +1,82 @@
+services:
+  web:
+    image: ghcr.io/mohamedbassem/hoarder-web:${HOARDER_VERSION:-release}
+    container_name: hoarder-web
+    restart: unless-stopped
+    networks:
+      - proxy
+      - backend
+    volumes:
+      - data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hoarder.rule=Host(`hoarder1.home.eduardocouto.dev`)"
+      - "traefik.http.routers.hoarder.entrypoints=https"
+      - "traefik.http.routers.hoarder.tls=true"
+      - "traefik.http.services.hoarder.loadbalancer.server.port=3000"
+      - "traefik.http.services.hoarder.loadbalancer.passHostHeader=true"
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      REDIS_HOST: redis
+      MEILI_ADDR: http://meilisearch:7700
+      DATA_DIR: /data
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+    networks:
+      - backend
+  chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    networks:
+      - backend
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    networks:
+      - backend
+    volumes:
+      - meilisearch:/meili_data
+  workers:
+    image: ghcr.io/mohamedbassem/hoarder-workers:${HOARDER_VERSION:-release}
+    restart: unless-stopped
+    volumes:
+      - data:/data
+    env_file:
+      - .env
+    networks:
+      - backend
+    environment:
+      REDIS_HOST: redis
+      MEILI_ADDR: http://meilisearch:7700
+      BROWSER_WEB_URL: http://chrome:9222
+      DATA_DIR: /data
+    depends_on:
+      web:
+        condition: service_started
+
+volumes:
+  redis:
+  meilisearch:
+  data:
+
+networks:
+  proxy:
+    external: true
+  backend:
+    name: hoarder_backend

@@ -1,3 +1,9 @@
+# Eduardo Couto Home Lab
+
+## Architecture of the solution
+
+![Eduardo Couto Architecuture Diagram](./assets/architecture.svg)
+
 ### Update the server
 
 ```bash
@@ -25,6 +31,43 @@ sudo apt install git btop -y
 ```bash
 curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker eduardo
+```
+
+Enable Docker API to allow portainer to access containers info
+
+```bash
+
+# Create directory for daemon configuration
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# Create override file
+sudo nano /etc/systemd/system/docker.service.d/override.conf
+
+```
+
+Add this content to override.conf file
+
+```bash
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+```
+
+Then
+
+```bash
+# Reload daemon and restart Docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# Verify API is listening
+curl http://localhost:2375/version
+```
+
+#### Create External Docker Network
+
+```bash
+docker network create proxy
 ```
 
 ### Configure Git
@@ -106,6 +149,9 @@ sudo ufw allow ssh
 
 # Allow WireGuard port
 # sudo ufw allow 51820/udp comment 'WireGuard VPN'
+
+## Allow Docker API
+sudo ufw allow 2375
 
 # Enable Firewall
 sudo ufw enable
