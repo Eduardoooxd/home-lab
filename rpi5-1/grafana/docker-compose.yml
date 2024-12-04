@@ -1,0 +1,25 @@
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.home.eduardocouto.dev`)"
+      - "traefik.http.routers.grafana.entrypoints=https"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    environment:
+      - GF_SERVER_ROOT_URL=https://grafana.home.eduardocouto.dev/
+    
+    volumes:
+      - grafana_storage:/var/lib/grafana
+
+volumes:
+  grafana_storage: {}
+
+networks:
+  proxy:
+    external: true

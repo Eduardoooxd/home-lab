@@ -2,3 +2,7 @@
 
 **/certs/*
 !**/certs/*.example
+
+**/forgejo/*
+**/git/*
+**/gitea/*

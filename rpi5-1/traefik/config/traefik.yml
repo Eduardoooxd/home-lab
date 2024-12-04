@@ -5,6 +5,17 @@ global:
 log:
   level: DEBUG
 
+metrics: 
+  prometheus:
+    addServicesLabels: true
+    addEntryPointsLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
+    entryPoint: metrics
+
 api:
   dashboard: true
   debug: true
@@ -19,6 +30,8 @@ entryPoints:
           scheme: https
   https:
     address: ":443"
+  metrics:
+    address: ":8082"
 
 serversTransport:
   insecureSkipVerify: true
