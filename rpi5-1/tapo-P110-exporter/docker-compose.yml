@@ -1,0 +1,17 @@
+services:
+  tapo-P110-exporter:
+    image: povilasid/p110-exporter
+    restart: unless-stopped
+    container_name: P110-exporter
+    volumes:
+       - ./tapo.yml:/app/tapo.yaml:ro
+    env_file:
+      - .env
+    ports:
+      - 9333:9333
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
