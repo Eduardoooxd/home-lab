@@ -1,38 +1,47 @@
 services:
   web:
     image: ghcr.io/mohamedbassem/hoarder-web:${HOARDER_VERSION:-release}
-    container_name: hoarder-web
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
     networks:
-      - proxy
+      - traefik-public
       - backend
     volumes:
       - data:/data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.hoarder.rule=Host(`hoarder.home.eduardocouto.dev`)"
-      - "traefik.http.routers.hoarder.entrypoints=https"
-      - "traefik.http.routers.hoarder.tls=true"
-      - "traefik.http.services.hoarder.loadbalancer.server.port=3000"
-      - "traefik.http.services.hoarder.loadbalancer.passHostHeader=true"
-    ports:
-      - 3000:3000
     env_file:
       - .env
     environment:
       REDIS_HOST: redis
       MEILI_ADDR: http://meilisearch:7700
       DATA_DIR: /data
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.hoarder.rule=Host(`hoarder.home.eduardocouto.dev`)"
+        - "traefik.http.routers.hoarder.entrypoints=https"
+        - "traefik.http.routers.hoarder.tls=true"
+        - "traefik.http.services.hoarder.loadbalancer.server.port=3000"
+        - "traefik.http.services.hoarder.loadbalancer.passHostHeader=true"
+      replicas: 1
+
   redis:
     image: redis:7.2-alpine
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
     volumes:
       - redis:/data
     networks:
       - backend
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      replicas: 1
+
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:123
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
     networks:
       - backend
     command:
@@ -41,9 +50,15 @@ services:
       - --remote-debugging-address=0.0.0.0
       - --remote-debugging-port=9222
       - --hide-scrollbars
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      replicas: 1
+
   meilisearch:
     image: getmeili/meilisearch:v1.6
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
     env_file:
       - .env
     environment:
@@ -52,9 +67,15 @@ services:
       - backend
     volumes:
       - meilisearch:/meili_data
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      replicas: 1
+
   workers:
     image: ghcr.io/mohamedbassem/hoarder-workers:${HOARDER_VERSION:-release}
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
     volumes:
       - data:/data
     env_file:
@@ -66,9 +87,11 @@ services:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
       DATA_DIR: /data
-    depends_on:
-      web:
-        condition: service_started
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      replicas: 1
 
 volumes:
   redis:
@@ -76,7 +99,11 @@ volumes:
   data:
 
 networks:
-  proxy:
+  traefik-public:
     external: true
+    driver: overlay
+    attachable: true
   backend:
     name: hoarder_backend
+    driver: overlay
+    attachable: true
