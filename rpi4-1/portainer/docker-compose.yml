@@ -1,10 +1,26 @@
 services:
   portainer:
     image: portainer/portainer-ce:latest
-    ports:
-      - 9443:9443
-      - 8000:8000
+    hostname: '{{.Node.Hostname}}'
+    container_name: portainer
+    networks:
+      - traefik-public
     volumes:
-      - ~/.portainer/data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi4-1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.portainer.rule=Host(`portainer.home.eduardocouto.dev`)"
+        - "traefik.http.routers.portainer.entrypoints=https"
+        - "traefik.http.routers.portainer.tls=true"
+      replicas: 1
+
+networks:
+  traefik-public:
+    external: true
+    driver: overlay
+    attachable: true
