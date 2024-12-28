@@ -24,4 +24,4 @@ scrape_configs:
 
   - job_name: 'P110-exporter'
     static_configs:
-      - targets: ['P110-exporter:9333']
+      - targets: ['tapo-p110-exporter:9333']

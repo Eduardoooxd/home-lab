@@ -1,15 +1,17 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
     hostname: '{{.Node.Hostname}}'
     networks:
       - traefik-public
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_storage:/prometheus 
+    configs:
+      - source:  prometheus-config
+        target: /etc/prometheus/prometheus.yml
+        mode: 0444
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -25,6 +27,10 @@ services:
       placement:
         constraints:
           - node.hostname == rpi5-1
+
+configs:
+  prometheus-config:
+    file: ./prometheus.yml
 
 volumes:
   prometheus_storage:
