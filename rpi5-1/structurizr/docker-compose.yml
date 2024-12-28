@@ -1,0 +1,25 @@
+services:
+  structurizr:
+    image: structurizr/onpremises:2024.12.07
+    hostname: '{{.Node.Hostname}}'
+    networks:
+      - traefik-public
+    environment:
+      - URL=https://docs.home.eduardocouto.dev/
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.structurizr.rule=Host(`docs.home.eduardocouto.dev`)"
+        - "traefik.http.routers.structurizr.entrypoints=https"
+        - "traefik.http.routers.structurizr.tls=true"
+        - "traefik.http.services.structurizr.loadbalancer.server.port=8080"
+      replicas: 1
+
+networks:
+  traefik-public:
+    external: true
+    driver: overlay
+    attachable: true
