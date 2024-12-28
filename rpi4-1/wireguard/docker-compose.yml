@@ -1,0 +1,32 @@
+# wireguard/docker-compose.yml
+services:
+  wireguard:
+    image: weejewel/wg-easy
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - WG_HOST=auto
+      - PASSWORD=
+      - WG_PORT=51821
+      # Point to Pi-hole for DNS
+      - WG_DEFAULT_DNS=172.40.0.3
+      # Allow access to both networks
+      - WG_ALLOWED_IPS=10.13.13.0/24,172.40.0.0/16,192.168.1.0/24
+    volumes:
+      - ./config:/etc/wireguard
+    ports:
+      - "51820:51820/udp" # WireGuard port
+      - "51821:51821" # Web UI
+    restart: unless-stopped
+    networks:
+      proxy:
+        ipv4_address: 172.40.0.2
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+
+networks:
+  proxy:
+    external: true

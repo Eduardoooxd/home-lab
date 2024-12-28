@@ -1,0 +1,15 @@
+services:
+  cloudflaredtunnel:
+    container_name: cloudflaredtunnel
+    image: cloudflare/cloudflared:2024.10.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: tunnel --no-autoupdate run
+    networks:
+      proxy:
+        ipv4_address: 172.40.0.4
+
+networks:
+  proxy:
+    external: true
