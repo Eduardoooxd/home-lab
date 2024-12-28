@@ -1,0 +1,16 @@
+services:
+  speedtest-exporter:
+    image: ghcr.io/miguelndecarvalho/speedtest-exporter:v3.5.4
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi4-1 
+      replicas: 1
+
+networks:
+  traefik-public:
+    external: true
+    driver: overlay
+    attachable: true
