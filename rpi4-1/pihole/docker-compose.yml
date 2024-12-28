@@ -1,0 +1,26 @@
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    environment:
+      - TZ=Europe/London
+      - WEBPASSWORD=your_secure_password
+      - SERVERIP=192.168.1.240
+      - VIRTUAL_HOST=pi.hole
+      - PROXY_LOCATION=pi.hole
+      - PIHOLE_DNS_=1.1.1.1;1.0.0.1
+    ports:
+      - "8080:80/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - ./etc-pihole:/etc/pihole
+      - ./etc-dnsmasq.d:/etc/dnsmasq.d
+    networks:
+      proxy:
+        ipv4_address: 172.40.0.3
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
