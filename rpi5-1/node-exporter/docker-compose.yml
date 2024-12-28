@@ -1,8 +1,9 @@
 services:
   node-exporter:
     image: prom/node-exporter:latest
-    container_name: node_exporter
-    restart: unless-stopped
+    hostname: '{{.Node.Hostname}}'
+    networks:
+      - traefik-public
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -11,9 +12,13 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    networks:
-      - proxy
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi5-1
 
 networks:
-  proxy:
+  traefik-public:
     external: true
+    driver: overlay
+    attachable: true
