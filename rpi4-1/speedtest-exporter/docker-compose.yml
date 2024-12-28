@@ -1,8 +1,10 @@
 services:
   speedtest-exporter:
-    image: ghcr.io/miguelndecarvalho/speedtest-exporter:v3.5.4
+    image: billimek/prometheus-speedtest-exporter:latest
     networks:
       - traefik-public
+    ports:
+      - "9469:9469"
     deploy:
       placement:
         constraints:
