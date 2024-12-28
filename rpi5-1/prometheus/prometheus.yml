@@ -18,9 +18,12 @@ scrape_configs:
 
   - job_name: 'speedtest'
     static_configs:
-      - targets: ['speedtest-exporter:9798']
+      - targets: ['speedtest-exporter:9469']
     scrape_interval: 60m
-    scrape_timeout: 90s # It takes time to execute
+    scrape_timeout: 90s
+    metrics_path: /probe
+    params:
+      script: [speedtest]
 
   - job_name: 'P110-exporter'
     static_configs:
