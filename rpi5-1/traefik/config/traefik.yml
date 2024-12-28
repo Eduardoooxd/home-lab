@@ -49,6 +49,6 @@ certificatesResolvers:
           - "1.0.0.1:53"
 
 providers:
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
+  swarm:
     exposedByDefault: false
+    network: traefik-public
