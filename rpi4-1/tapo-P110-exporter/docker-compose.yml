@@ -1,0 +1,27 @@
+services:
+  tapo-p110-exporter:
+    image: povilasid/p110-exporter
+    hostname: '{{.Node.Hostname}}'
+    networks:
+      - traefik-public
+    configs:
+      - source: tapo-config
+        target: /app/tapo.yaml
+        mode: 0444
+    env_file:
+      - .env
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rpi4-1 
+      replicas: 1
+
+configs:
+  tapo-config:
+    file: ./tapo.yml
+
+networks:
+  traefik-public:
+    external: true
+    driver: overlay
+    attachable: true
