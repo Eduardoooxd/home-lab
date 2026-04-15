@@ -133,11 +133,11 @@ nmcli con show
 It is typically named after the SSID or `preconfigured`. Then apply the static IP (replace `"preconfigured"` with the actual connection name):
 
 ```bash
-nmcli con mod "preconfigured" ipv4.addresses 192.168.1.10/24
-nmcli con mod "preconfigured" ipv4.gateway 192.168.1.1
-nmcli con mod "preconfigured" ipv4.dns "127.0.0.1 1.1.1.1"
-nmcli con mod "preconfigured" ipv4.method manual
-nmcli con up "preconfigured"
+sudo nmcli con mod "preconfigured" ipv4.addresses 192.168.1.105/24
+sudo nmcli con mod "preconfigured" ipv4.gateway 192.168.1.1
+sudo nmcli con mod "preconfigured" ipv4.dns "127.0.0.1 1.1.1.1"
+sudo nmcli con mod "preconfigured" ipv4.method manual
+sudo nmcli con up "preconfigured"
 ```
 
 > **Note:** Using `127.0.0.1` as the primary DNS points the Pi itself to Pi-hole after installation. `1.1.1.1` is kept as a fallback for bootstrap resolution.
@@ -151,7 +151,7 @@ ip addr show wlan0
 Reconnect using the new static IP:
 
 ```bash
-ssh -i ~/.ssh/pi-zero2w eduardo@192.168.1.10
+ssh -i ~/.ssh/pi-zero2w eduardo@192.168.1.105
 ```
 
 ---
@@ -168,6 +168,7 @@ sudo ufw allow 22/tcp
 
 # Allow Pi-hole web UI (HTTP)
 sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
 
 # Allow DNS (TCP + UDP)
 sudo ufw allow 53/tcp
@@ -216,7 +217,7 @@ pihole -a -p
 Open in a browser:
 
 ```
-http://192.168.1.10/admin
+http://192.168.1.105/admin
 ```
 
 Log in with the password set during installation.
@@ -225,7 +226,7 @@ Log in with the password set during installation.
 
 ## 9. Point the Router to Pi-hole
 
-Log into the router admin panel and set the **primary DNS** to `192.168.1.10`. This routes all DNS queries on the network through Pi-hole.
+Log into the router admin panel and set the **primary DNS** to `192.168.1.105`. This routes all DNS queries on the network through Pi-hole.
 
 Alternatively, set it per device to avoid changing router settings.
 
@@ -238,10 +239,10 @@ Alternatively, set it per device to avoid changing router settings.
 pihole status
 
 # On any device using Pi-hole DNS
-nslookup doubleclick.net 192.168.1.10
+nslookup doubleclick.net 192.168.1.105
 # Should return 0.0.0.0 (blocked)
 
-nslookup google.com 192.168.1.10
+nslookup google.com 192.168.1.105
 # Should resolve normally
 ```
 
@@ -266,7 +267,7 @@ Add to `~/.ssh/config` on the local machine for easy access:
 
 ```
 Host rpi-zero2w
-    HostName 192.168.1.10
+    HostName 192.168.1.105
     User eduardo
     IdentityFile ~/.ssh/pi-zero2w
 ```
